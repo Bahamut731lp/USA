@@ -1,0 +1,83 @@
+clc
+clear
+
+%% Příklad 1
+otec = [71,72,74,76,77,78,71,72,73,75,77,64,49,52,63,65,68,71,72,75,84,81,79,76,73,75,79,82];
+syn = [72,74,77,69,78,82,84,78,79,79,77,68,59,72,81,68,69,73,76,78,86,87,88,91,83,87,88,93];
+
+% Testování shody rozptylů
+[h,p] = vartest2(otec,syn,0.05,'both')
+
+% Testování, zda jsou data z normálního rozdělení
+[h_otec, p_otec] = lillietest(otec, "Alpha", 0.05, "Distr","norm")
+[h_syn, p_syn] = lillietest(syn, "Alpha", 0.05, "Distr","norm")
+
+% Testování hypotézy
+[h_ttest, p_ttest] = ttest2(otec, syn - 2, "Alpha", 0.05, "Tail","left", "Vartype","equal")
+[]ttest(otec - syn, 2, "Alpha",0.05)
+[p_ranksum,h_ranksum,stats] = ranksum(otec,syn - 2,"alpha",0.05, "method","exact", "tail","left")
+
+%% Příklad 2
+karty = [1, 1, 2, 7, 8, 9, 10, 11]; % Body odpovídající jednotlivým kartám
+
+vytahnu_dve_esa = 4/32 * 3/31
+vytahnu_eso_a_deset = 4/32 * 4/31
+
+p_a = vytahnu_eso_a_deset + vytahnu_dve_esa
+
+p_b = 1 - p_a
+
+%% Příklad 3
+
+P_1 = 4/32 * 3/27 * 2/22 * 1/17
+P_2 = 2/20 * 26/30 * 21/25
+
+%% Příklad 4
+clc
+clear
+
+nula = [0.45,0.51,0.54,0.56,0.62,0.67,0.71,0.74];
+jedna = [0.48,0.49,0.54,0.57,0.62,0.65,0.67,0.71,0.78,0.82];
+dva = [0.56,0.62,0.65,0.67,0.72,0.78,0.82,0.84,0.87,0.91];
+ctyri = [0.56,0.58,0.64,0.67,0.71,0.83,0.85,0.89];
+sest = [0.47,0.51,0.54,0.56,0.58,0.62,0.67,0.71,0.75,0.78];
+osm = [0.56,0.57,0.61,0.64,0.67,0.69,0.76,0.82,0.85];
+
+% Ověření normality
+[h_nula, p_nula] = lillietest(nula, "Alpha", 0.01, "Distr","norm")
+[h_jedna, p_jedna] = lillietest(jedna, "Alpha", 0.01, "Distr","norm")
+[h_dva, p_dva] = lillietest(dva, "Alpha", 0.01, "Distr","norm")
+[h_ctyri, p_ctyri] = lillietest(ctyri, "Alpha", 0.01, "Distr","norm")
+[h_sest, p_sest] = lillietest(sest, "Alpha", 0.01, "Distr","norm")
+[h_osm, p_osm] = lillietest(osm, "Alpha", 0.01, "Distr","norm")
+
+% Vytvoření skupin pro jednofaktorovou anovu
+skupina1(1:length(nula)) = 1;
+skupina2(1:length(jedna)) = 2;
+skupina3(1:length(dva)) = 3;
+skupina4(1:length(ctyri)) = 4;
+skupina5(1:length(sest)) = 5;
+skupina6(1:length(osm)) = 6;
+
+data = [nula, jedna, dva, ctyri, sest, osm]';
+skupina = [skupina1, skupina2, skupina3, skupina4, skupina5, skupina6]';
+
+[p_rozptyl] = vartestn(data,skupina, "Display","off") % 0.9915
+[p_anova] = anova1(data, skupina, "off") % 0.0487
+
+% Rozdíl mezi nástupem a osmou hodinou
+% Data jsou z normálního rozdělení, použijeme dvouvýběrový ttest
+[h_ttest, p_ttest] = ttest2(osm, nula, "Alpha", 0.05, "Tail","right", "Vartype","equal") %0.0547
+
+%% Příklad 5
+clc
+clear
+T = [32, 36, 43, 47, 52, 56, 61, 67, 72, 78, 84, 89, 103, 107, 112, 121, 145, 167, 181, 189, 194, 203, 209, 212, 216, 223, 227, 234, 241, 248, 255, 261, 267, 273, 279, 285, 291, 294, 297, 303, 305, 309, 313, 317, 321, 324];
+
+a(:,1)=T';
+a(:,2)=wblcdf(a(:,1),mean(T),var(T));
+[h, p, stats] = kstest(T, "CDF", a)
+
+[odhad, intervalyx] = wblfit(T)
+
+[h, p] = lillietest(T, "Alpha", 0.05, "Distr", "norm")
