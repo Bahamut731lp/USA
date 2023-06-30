@@ -25,6 +25,7 @@ nav:
     - 'diskretni_rozdeleni.md'
     - 'spojita_rozdeleni.md'
     - 'vyberove_charakteristiky.md'
+    - 'zkousky.md'
 
 markdown_extensions:
     - mdx_math
